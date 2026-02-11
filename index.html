@@ -260,10 +260,8 @@
                 { q: "Năm Canh Tý (2020), ngày mùng 1 Tết trùng với sự kiện thiên văn nào?", a: ["Nhật thực", "Mưa sao băng", "Siêu trăng", "Không có sự kiện đặc biệt"], c: 3 },
                 { q: "Trong bài thơ 'Ông Đồ', tại sao 'Giấy đỏ buồn không thắm'?", a: ["Vì trời mưa", "Vì không ai thuê viết", "Vì giấy cũ", "Vì mực hỏng"], c: 1 },
                 { q: "Món 'Thịt kho tàu' thực chất có nguồn gốc từ đâu theo cách giải thích chữ 'Tàu'?", a: ["Trung Quốc", "Người Hoa ở VN", "Vị mặn của nước biển (tàu thuyền)", "Sông nước/Lạt (tiếng miền Tây)"], c: 3 },
-                { q: "Tục lệ 'Cưới vợ gả chồng' ngày Tết xưa gọi là gì?", a: ["Tết Hỉ", "Lễ xem mắt", "Tết làm rể", "Lễ dạm ngõ"], c: 2 },
                 { q: "Năm 2026, theo lịch âm là năm Bính Ngọ. Vậy năm 1966 cũng là Bính Ngọ, năm đó thuộc mệnh gì?", a: ["Thiên Thượng Thủy", "Thiên Hà Thủy", "Lộ Bàng Thổ", "Sa Trung Kim"], c: 1 },
                 { q: "Sự kiện nào đánh dấu sự thay đổi lớn nhất của Savills toàn cầu vào năm 1988?", a: ["Đổi tên từ Savill & Sons", "Niêm yết trên sàn chứng khoán London", "Mở văn phòng tại Mỹ", "Mua lại tập đoàn CBRE"], c: 1 },
-                { q: "Trong mâm cỗ Tết, 'Bánh chưng' đại diện cho Đất, vậy món nào đại diện cho Trời?", a: ["Bánh Giầy", "Xôi gấc", "Gà luộc", "Rượu"], c: 0 },
                 // --- New questions from CSV ---
                 { q: "Quốc gia nào có nhiều múi giờ nhất thế giới?", a: ["Nga", "Mỹ", "Pháp", "Trung Quốc"], c: 2 },
                 { q: "Số nào sau đây không thể viết thành tổng của hai số nguyên tố?", a: ["9", "11", "13", "15"], c: 1 },
@@ -295,7 +293,7 @@
             // Refill if empty or not enough
             if (availableIndices[poolName].length < count) {
                 availableIndices[poolName] = Array.from(
-                    { length: questionPools[poolName].length }, 
+                    { length: questionPools[poolName].length },
                     (_, i) => i
                 );
                 shuffle(availableIndices[poolName]);
@@ -327,7 +325,7 @@
             const easy = getQuestionsFromPool('easy', 5);
             const medium = getQuestionsFromPool('medium', 5);
             const hard = getQuestionsFromPool('hard', 5);
-            
+
             currentQuestions = [...easy, ...medium, ...hard];
             currentIndex = 1;
             usedLifelines = { f50: false, call: false, aud: false };
