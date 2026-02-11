@@ -284,6 +284,29 @@
         let currentIndex = 0;
         let usedLifelines = { f50: false, call: false, aud: false };
 
+        // Persistent question tracking
+        let availableIndices = {
+            easy: [],
+            medium: [],
+            hard: []
+        };
+
+        function getQuestionsFromPool(poolName, count) {
+            // Refill if empty or not enough
+            if (availableIndices[poolName].length < count) {
+                availableIndices[poolName] = Array.from(
+                    { length: questionPools[poolName].length }, 
+                    (_, i) => i
+                );
+                shuffle(availableIndices[poolName]);
+                console.log(`Refilled ${poolName} pool.`);
+            }
+
+            // Pick indices and remove them
+            const pickedIndices = availableIndices[poolName].splice(0, count);
+            return pickedIndices.map(idx => questionPools[poolName][idx]);
+        }
+
         function renderLadder() {
             const ladder = document.getElementById('ladder');
             ladder.innerHTML = '';
@@ -300,10 +323,11 @@
         }
 
         function startGame() {
-            // Pick 5 from each pool
-            const easy = shuffle([...questionPools.easy]).slice(0, 5);
-            const medium = shuffle([...questionPools.medium]).slice(0, 5);
-            const hard = shuffle([...questionPools.hard]).slice(0, 5);
+            // Pick 5 from each pool without immediate reuse
+            const easy = getQuestionsFromPool('easy', 5);
+            const medium = getQuestionsFromPool('medium', 5);
+            const hard = getQuestionsFromPool('hard', 5);
+            
             currentQuestions = [...easy, ...medium, ...hard];
             currentIndex = 1;
             usedLifelines = { f50: false, call: false, aud: false };
