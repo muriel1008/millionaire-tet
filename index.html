@@ -153,6 +153,22 @@
 <script>
     const questionPools = {
         easy: [
+            // --- Original questions ---
+            { q: "Hoa nào đặc trưng cho Tết miền Bắc?", a: ["Hoa Mai", "Hoa Đào", "Hoa Hồng", "Hoa Cúc"], c: 1 },
+            { q: "Bánh chưng có hình gì?", a: ["Hình tròn", "Hình vuông", "Hình tam giác", "Hình dài"], c: 1 },
+            { q: "Ngày 23 tháng Chạp là ngày tiễn ai về trời?", a: ["Ông Địa", "Ông Táo", "Thần Tài", "Ông Bà"], c: 1 },
+            { q: "Mâm ngũ quả miền Nam thường có quả nào?", a: ["Chuối", "Đu đủ", "Cam", "Lê"], c: 1 },
+            { q: "Năm 2026 là năm con gì?", a: ["Giáp Thìn", "Bính Ngọ", "Ất Tỵ", "Đinh Mùi"], c: 1 },
+            { q: "Tục lệ xông đất diễn ra vào lúc nào?", a: ["Giao thừa", "Sáng mùng 1", "Chiều mùng 1", "Mùng 2"], c: 0 },
+            { q: "Lì xì thường được đựng trong phong bao màu gì?", a: ["Vàng", "Đỏ", "Xanh", "Trắng"], c: 1 },
+            { q: "Quả nào sau đây KHÔNG nằm trong mâm ngũ quả 'Cầu dừa đủ xoài sung'?", a: ["Dưa hấu", "Đu đủ", "Xoài", "Sung"], c: 0 },
+            { q: "Con vật nào đứng đầu trong 12 con giáp?", a: ["Trâu", "Hổ", "Chuột", "Rồng"], c: 2 },
+            { q: "Thịt kho tàu thường được ăn kèm với món gì ngày Tết?", a: ["Dưa giá", "Cà pháo", "Kim chi", "Su hào"], c: 0 },
+            { q: "Đêm giao thừa còn có tên gọi khác là gì?", a: ["Trừ tịch", "Thượng nguyên", "Trung nguyên", "Hạ nguyên"], c: 0 },
+            { q: "Mâm cỗ Tết miền Bắc không thể thiếu món canh nào?", a: ["Canh chua", "Canh khổ qua", "Canh bóng thập cẩm", "Canh khoai tây"], c: 2 },
+            { q: "Lễ hội Gò Đống Đa diễn ra vào ngày nào tháng Giêng?", a: ["Mùng 3", "Mùng 5", "Mùng 10", "Rằm"], c: 1 },
+            { q: "Tục lệ 'Khai bút đầu năm' mong muốn điều gì?", a: ["Học hành tấn tới", "Sống thọ", "Phát tài", "Nhiều con cái"], c: 0 },
+            // --- New questions from CSV ---
             { q: "Loài vật nào không bao giờ ngủ?", a: ["Cá mập", "Cá heo", "Chim sẻ", "Dơi"], c: 0 },
             { q: "Nếu vượt qua người đứng thứ hai trong một cuộc đua, bạn đang ở vị trí nào?", a: ["Thứ nhất", "Thứ hai", "Thứ ba", "Không xác định"], c: 1 },
             { q: "Từ nào sau đây không có nguồn gốc Hán – Việt?", a: ["Gia đình", "Xã hội", "Cà phê", "Kinh tế"], c: 2 },
@@ -170,6 +186,21 @@
             { q: "Quốc gia nào đón năm mới bằng việc ăn nho theo từng tiếng chuông?", a: ["Ý", "Tây Ban Nha", "Mexico", "Argentina"], c: 1 }
         ],
         medium: [
+            // --- Original questions ---
+            { q: "Quả nào 'Cầu' trong mâm ngũ quả?", a: ["Dừa", "Xoài", "Mãng cầu", "Sung"], c: 2 },
+            { q: "Năm nhuận âm lịch thường có mấy tháng?", a: ["12", "13", "11", "14"], c: 1 },
+            { q: "Savills Việt Nam được thành lập năm nào?", a: ["1995", "1998", "2000", "2005"], c: 0 },
+            { q: "Loại cây nào là biểu tượng của quân tử trong Tứ Quý?", a: ["Mai", "Trúc", "Cúc", "Tùng"], c: 1 },
+            { q: "Canh khổ qua ngày Tết ngụ ý gì?", a: ["Cho đắng", "Khổ qua đi", "Ăn cho mát", "Giữ dáng"], c: 1 },
+            { q: "Vị vua nào đại phá quân Thanh vào dịp Tết?", a: ["Quang Trung", "Lê Lợi", "Gia Long", "Đinh Bộ Lĩnh"], c: 0 },
+            { q: "Tết Nguyên Tiêu là ngày rằm tháng mấy?", a: ["Tháng Chạp", "Tháng Giêng", "Tháng Bảy", "Tháng Tám"], c: 1 },
+            { q: "Con giáp nào trong 12 con giáp VN khác với Trung Quốc?", a: ["Mèo", "Trâu", "Dê", "Lợn"], c: 0 },
+            { q: "Gà cúng đêm Giao thừa thường ngậm gì?", a: ["Lá chanh", "Bông hồng", "Đồng tiền", "Cành đào"], c: 1 },
+            { q: "Tết năm 1968 bắt đầu vào ngày dương lịch nào?", a: ["29/01", "30/01", "31/01", "01/02"], c: 1 },
+            { q: "Bức tranh 'Đám cưới chuột' thuộc dòng tranh nào?", a: ["Hàng Trống", "Đông Hồ", "Sơn mài", "Thủy mặc"], c: 1 },
+            { q: "Lễ Hóa vàng thường được thực hiện vào ngày nào?", a: ["Mùng 1", "Mùng 3 hoặc mùng 4", "Rằm tháng Giêng", "23 tháng Chạp"], c: 1 },
+            { q: "Sự khác biệt chính giữa Bánh Chưng và Bánh Tét là gì?", a: ["Nguyên liệu", "Nhân bánh", "Hình dáng và cách gói", "Thời gian luộc"], c: 2 },
+            // --- New questions from CSV ---
             { q: "Một năm không nhuận có bao nhiêu ngày Thứ Sáu nếu ngày 1/1 là Thứ Sáu?", a: ["52", "53", "54", "51"], c: 1 },
             { q: "Giác quan nào phát triển sớm nhất ở con người?", a: ["Thị giác", "Thính giác", "Khứu giác", "Xúc giác"], c: 3 },
             { q: "Điều nào sau đây khiến con người hối tiếc nhiều nhất khi nhìn lại?", a: ["Những việc đã làm sai", "Những việc chưa từng làm", "Những lời đã nói", "Những quyết định vội vàng"], c: 1 },
@@ -192,6 +223,23 @@
             { q: "Có 10 đôi găng tay (trái–phải). Lấy ngẫu nhiên bao nhiêu chiếc để chắc chắn có 1 đôi hoàn chỉnh?", a: ["11", "12", "21", "20"], c: 2 }
         ],
         hard: [
+            // --- Original questions ---
+            { q: "Theo phong tục, cây Nêu được hạ xuống vào ngày nào?", a: ["Mùng 3", "Mùng 7", "Rằm tháng Giêng", "Mùng 10"], c: 1 },
+            { q: "Năm 2026 (Bính Ngọ), tiết Lập Xuân rơi vào ngày nào dương lịch?", a: ["03/02", "04/02", "05/02", "06/02"], c: 1 },
+            { q: "Bức tranh ngũ quả nổi tiếng 'Phúc Lộc Thọ' của dòng tranh Hàng Trống có quả gì ở giữa?", a: ["Quả Phật thủ", "Quả Đào", "Quả Lựu", "Quả Mướp đắng"], c: 0 },
+            { q: "Trong nghi lễ cung đình Huế xưa, lễ tế quan trọng nhất đầu năm là gì?", a: ["Lễ Ban Sóc", "Lễ Tế Nam Giao", "Lễ Truyền Lô", "Lễ Thiết Triều"], c: 1 },
+            { q: "Savills Châu Á Thái Bình Dương có trụ sở chính đặt tại đâu?", a: ["Singapore", "Hong Kong", "Tokyo", "Sydney"], c: 1 },
+            { q: "Người đầu tiên ký hợp đồng liên doanh thành lập Savills Việt Nam là ai?", a: ["Neil MacGregor", "Matthew Powell", "Trần Quang Tuấn", "Sử Ngọc Khương"], c: 0 },
+            { q: "Năm Canh Tý (2020), ngày mùng 1 Tết trùng với sự kiện thiên văn nào?", a: ["Nhật thực", "Mưa sao băng", "Siêu trăng", "Không có sự kiện đặc biệt"], c: 3 },
+            { q: "Trong bài thơ 'Ông Đồ', tại sao 'Nghiên nghiên giấy đỏ buồn không thắm'?", a: ["Vì trời mưa", "Vì không ai thuê viết", "Vì giấy cũ", "Vì mực hỏng"], c: 1 },
+            { q: "Món 'Thịt kho tàu' thực chất có nguồn gốc từ đâu theo cách giải thích chữ 'Tàu'?", a: ["Trung Quốc", "Người Hoa ở VN", "Vị mặn của nước biển (tàu thuyền)", "Sông nước/Lạt (tiếng miền Tây)"], c: 3 },
+            { q: "Tục lệ 'Cưới vợ gả chồng' ngày Tết xưa gọi là gì?", a: ["Tết Hỉ", "Lễ xem mắt", "Tết làm rể", "Lễ dạm ngõ"], c: 2 },
+            { q: "Năm 2026, theo lịch âm là năm Bính Ngọ. Vậy năm 1966 cũng là Bính Ngọ, năm đó thuộc mệnh gì?", a: ["Thiên Thượng Thủy", "Thiên Hà Thủy", "Lộ Bàng Thổ", "Sa Trung Kim"], c: 1 },
+            { q: "Trong 12 con giáp, con vật nào là con vật duy nhất không có thật trong tự nhiên?", a: ["Rồng", "Lân", "Phượng", "Quy"], c: 0 },
+            { q: "Loại rượu nào thường được nhắc đến trong các điển tích Tết xưa?", a: ["Rượu nếp", "Rượu hồng đào", "Rượu cúc", "Rượu bồ đào"], c: 2 },
+            { q: "Sự kiện nào đánh dấu sự thay đổi lớn nhất của Savills toàn cầu vào năm 1988?", a: ["Đổi tên từ Savill & Sons", "Niêm yết trên sàn chứng khoán London", "Mở văn phòng tại Mỹ", "Mua lại tập đoàn CBRE"], c: 1 },
+            { q: "Trong mâm cỗ Tết, 'Bánh chưng' đại diện cho Đất, vậy món nào đại diện cho Trời?", a: ["Bánh Giầy", "Xôi gấc", "Gà luộc", "Rượu"], c: 0 },
+            // --- New questions from CSV ---
             { q: "Quốc gia nào có nhiều múi giờ nhất thế giới?", a: ["Nga", "Mỹ", "Pháp", "Trung Quốc"], c: 2 },
             { q: "Số nào sau đây không thể viết thành tổng của hai số nguyên tố?", a: ["9", "11", "13", "15"], c: 1 },
             { q: "Nếu hôm qua là ngày mai của ngày kia, thì hôm nay là thứ mấy?", a: ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm"], c: 2 },
