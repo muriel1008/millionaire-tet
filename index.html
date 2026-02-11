@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,11 +17,13 @@
             flex-direction: column;
             overflow: hidden;
         }
+
         .game-container {
             flex-grow: 1;
             display: flex;
             padding: 20px;
         }
+
         .main-stage {
             flex: 3;
             display: flex;
@@ -28,6 +31,7 @@
             justify-content: space-between;
             align-items: center;
         }
+
         .sidebar {
             flex: 1;
             background: rgba(0, 0, 0, 0.5);
@@ -36,6 +40,7 @@
             display: flex;
             flex-direction: column;
         }
+
         .question-box {
             background: linear-gradient(180deg, #002c5f 0%, #001a38 100%);
             border: 2px solid #00d4ff;
@@ -47,12 +52,14 @@
             margin-bottom: 20px;
             box-shadow: 0 0 15px #00d4ff;
         }
+
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             width: 90%;
         }
+
         .option-btn {
             background: linear-gradient(180deg, #002c5f 0%, #001a38 100%);
             border: 2px solid #00d4ff;
@@ -64,13 +71,24 @@
             cursor: pointer;
             transition: 0.3s;
         }
+
         .option-btn:hover {
             background: #e67e22;
             border-color: #fff;
         }
-        .option-btn.correct { background: #27ae60 !important; }
-        .option-btn.wrong { background: #c0392b !important; }
-        .option-btn.selected { background: #f1c40f !important; color: #000; }
+
+        .option-btn.correct {
+            background: #27ae60 !important;
+        }
+
+        .option-btn.wrong {
+            background: #c0392b !important;
+        }
+
+        .option-btn.selected {
+            background: #f1c40f !important;
+            color: #000;
+        }
 
         .ladder-item {
             padding: 5px 15px;
@@ -79,8 +97,16 @@
             font-weight: bold;
             color: #bdc3c7;
         }
-        .ladder-item.active { background: #e67e22; color: white; }
-        .ladder-item.milestone { color: white; border-bottom: 1px solid #555; }
+
+        .ladder-item.active {
+            background: #e67e22;
+            color: white;
+        }
+
+        .ladder-item.milestone {
+            color: white;
+            border-bottom: 1px solid #555;
+        }
 
         .lifelines {
             display: flex;
@@ -88,6 +114,7 @@
             gap: 20px;
             margin-bottom: 30px;
         }
+
         .lifeline-circle {
             width: 60px;
             height: 60px;
@@ -100,11 +127,13 @@
             font-weight: bold;
             background: #002c5f;
         }
+
         .lifeline-circle.used {
             opacity: 0.3;
             text-decoration: line-through;
             cursor: not-allowed;
         }
+
         .prize-display {
             font-size: 2rem;
             color: #f1c40f;
@@ -112,284 +141,286 @@
         }
     </style>
 </head>
+
 <body>
 
-<nav class="navbar navbar-dark bg-dark px-4">
-    <span class="navbar-brand mb-0 h1">SAVILLS TET EDITION: AI LÀ TRIỆU PHÚ</span>
-    <div>
-        <button class="btn btn-outline-warning" onclick="walkAway()">Walk Away</button>
-        <button class="btn btn-outline-danger" onclick="resetGame()">Next Contestant</button>
+    <nav class="navbar navbar-dark bg-dark px-4">
+        <span class="navbar-brand mb-0 h1">SAVILLS TET EDITION: AI LÀ TRIỆU PHÚ</span>
+        <div>
+            <button class="btn btn-outline-warning" onclick="walkAway()">Walk Away</button>
+            <button class="btn btn-outline-danger" onclick="resetGame()">Next Contestant</button>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        <div class="main-stage">
+            <div class="lifelines">
+                <div id="ll-50" class="lifeline-circle" onclick="use5050()">50:50</div>
+                <div id="ll-call" class="lifeline-circle" onclick="useCall()">☎</div>
+                <div id="ll-audience" class="lifeline-circle" onclick="useAudience()">👥</div>
+            </div>
+
+            <div id="prize-zone" class="prize-display">Đang chuẩn bị...</div>
+
+            <div class="question-box" id="question-text">
+                Bấm "Bắt đầu" để mời thí sinh lên ghế nóng!
+            </div>
+
+            <div class="options-grid" id="options-container">
+                <!-- Options will appear here -->
+            </div>
+
+            <div class="mt-4">
+                <button id="start-btn" class="btn btn-primary btn-lg" onclick="startGame()">BẮT ĐẦU CHƠI</button>
+            </div>
+        </div>
+
+        <div class="sidebar" id="ladder">
+            <!-- Prize ladder will be generated here -->
+        </div>
     </div>
-</nav>
 
-<div class="game-container">
-    <div class="main-stage">
-        <div class="lifelines">
-            <div id="ll-50" class="lifeline-circle" onclick="use5050()">50:50</div>
-            <div id="ll-call" class="lifeline-circle" onclick="useCall()">☎</div>
-            <div id="ll-audience" class="lifeline-circle" onclick="useAudience()">👥</div>
-        </div>
+    <script>
+        const questionPools = {
+            easy: [
+                // --- Original questions ---
+                { q: "Hoa nào đặc trưng cho Tết miền Bắc?", a: ["Hoa Mai", "Hoa Đào", "Hoa Hồng", "Hoa Cúc"], c: 1 },
+                { q: "Bánh chưng có hình gì?", a: ["Hình tròn", "Hình vuông", "Hình tam giác", "Hình dài"], c: 1 },
+                { q: "Ngày 23 tháng Chạp là ngày tiễn ai về trời?", a: ["Ông Địa", "Ông Táo", "Thần Tài", "Ông Bà"], c: 1 },
+                { q: "Mâm ngũ quả miền Nam thường có quả nào?", a: ["Chuối", "Đu đủ", "Cam", "Lê"], c: 1 },
+                { q: "Năm 2026 là năm con gì?", a: ["Giáp Thìn", "Bính Ngọ", "Ất Tỵ", "Đinh Mùi"], c: 1 },
+                { q: "Tục lệ xông đất diễn ra vào lúc nào?", a: ["Giao thừa", "Sáng mùng 1", "Chiều mùng 1", "Mùng 2"], c: 0 },
+                { q: "Lì xì thường được đựng trong phong bao màu gì?", a: ["Vàng", "Đỏ", "Xanh", "Trắng"], c: 1 },
+                { q: "Quả nào sau đây KHÔNG nằm trong mâm ngũ quả 'Cầu dừa đủ xoài sung'?", a: ["Dưa hấu", "Đu đủ", "Xoài", "Sung"], c: 0 },
+                { q: "Con vật nào đứng đầu trong 12 con giáp?", a: ["Trâu", "Hổ", "Chuột", "Rồng"], c: 2 },
+                { q: "Thịt kho tàu thường được ăn kèm với món gì ngày Tết?", a: ["Dưa giá", "Cà pháo", "Kim chi", "Su hào"], c: 0 },
+                { q: "Đêm giao thừa còn có tên gọi khác là gì?", a: ["Trừ tịch", "Thượng nguyên", "Trung nguyên", "Hạ nguyên"], c: 0 },
+                { q: "Mâm cỗ Tết miền Bắc không thể thiếu món canh nào?", a: ["Canh chua", "Canh khổ qua", "Canh bóng thập cẩm", "Canh khoai tây"], c: 2 },
+                { q: "Lễ hội Gò Đống Đa diễn ra vào ngày nào tháng Giêng?", a: ["Mùng 3", "Mùng 5", "Mùng 10", "Rằm"], c: 1 },
+                { q: "Tục lệ 'Khai bút đầu năm' mong muốn điều gì?", a: ["Học hành tấn tới", "Sống thọ", "Phát tài", "Nhiều con cái"], c: 0 },
+                // --- New questions from CSV ---
+                { q: "Loài vật nào không bao giờ ngủ?", a: ["Cá mập", "Cá heo", "Chim sẻ", "Dơi"], c: 0 },
+                { q: "Nếu vượt qua người đứng thứ hai trong một cuộc đua, bạn đang ở vị trí nào?", a: ["Thứ nhất", "Thứ hai", "Thứ ba", "Không xác định"], c: 1 },
+                { q: "Từ nào sau đây không có nguồn gốc Hán – Việt?", a: ["Gia đình", "Xã hội", "Cà phê", "Kinh tế"], c: 2 },
+                { q: "Ánh sáng từ Mặt Trời mất bao lâu để tới Trái Đất?", a: ["8 phút", "8 giây", "1 phút", "1 giờ"], c: 0 },
+                { q: "Internet ban đầu được tạo ra với mục đích chính nào?", a: ["Giải trí", "Giáo dục", "Quân sự", "Thương mại"], c: 2 },
+                { q: "Hành tinh nào quay quanh trục theo chiều ngược lại so với đa số các hành tinh khác?", a: ["Sao Hỏa", "Sao Kim", "Sao Thủy", "Sao Mộc"], c: 1 },
+                { q: "Số La Mã nào là số lớn nhất có thể viết chỉ bằng 3 ký tự?", a: ["LLL", "CXC", "DCC", "MMM"], c: 3 },
+                { q: "Màu sắc nào truyền thống KHÔNG mang ý nghĩa may mắn trong Tết Á Đông?", a: ["Đỏ", "Vàng", "Trắng", "Cam"], c: 2 },
+                { q: "Phong tục lì xì ban đầu mang ý nghĩa chính nào?", a: ["Cho tiền may mắn", "Trừ tà – xua đuổi điều xấu", "Thể hiện địa vị", "Phần thưởng đầu năm"], c: 1 },
+                { q: "Phong tục nào dưới đây mang ý nghĩa 'định hướng năm mới' nhiều hơn là cầu may?", a: ["Xông đất", "Lì xì", "Cúng giao thừa", "Chúc Tết"], c: 0 },
+                { q: "Vì sao người Việt kiêng quét nhà trong mùng 1 Tết?", a: ["Sợ xui", "Sợ mất tiền", "Sợ mất lộc", "Sợ làm phiền tổ tiên"], c: 2 },
+                { q: "Điểm chung quan trọng nhất của các nghi lễ Tết là gì?", a: ["Cúng bái", "Tụ họp", "Lặp lại hằng năm", "Tính biểu tượng"], c: 3 },
+                { q: "Trong văn hoá Tết, 'ăn' mang ý nghĩa gì nhiều nhất?", a: ["Thưởng thức", "No đủ", "Chia sẻ", "Hưởng thụ"], c: 2 },
+                { q: "Câu nói nào thể hiện rõ nhất tinh thần Tết Việt?", a: ["Có thực mới vực được đạo", "Một cây làm chẳng nên non", "Uống nước nhớ nguồn", "Được ăn cả, ngã về không"], c: 2 },
+                { q: "Quốc gia nào đón năm mới bằng việc ăn nho theo từng tiếng chuông?", a: ["Ý", "Tây Ban Nha", "Mexico", "Argentina"], c: 1 }
+            ],
+            medium: [
+                // --- Original questions ---
+                { q: "Quả nào 'Cầu' trong mâm ngũ quả?", a: ["Dừa", "Xoài", "Mãng cầu", "Sung"], c: 2 },
+                { q: "Năm nhuận âm lịch thường có mấy tháng?", a: ["12", "13", "11", "14"], c: 1 },
+                { q: "Savills Việt Nam được thành lập năm nào?", a: ["1995", "1998", "2000", "2005"], c: 0 },
+                { q: "Loại cây nào là biểu tượng của quân tử trong Tứ Quý?", a: ["Mai", "Trúc", "Cúc", "Tùng"], c: 1 },
+                { q: "Canh khổ qua ngày Tết ngụ ý gì?", a: ["Cho đắng", "Khổ qua đi", "Ăn cho mát", "Giữ dáng"], c: 1 },
+                { q: "Vị vua nào đại phá quân Thanh vào dịp Tết?", a: ["Quang Trung", "Lê Lợi", "Gia Long", "Đinh Bộ Lĩnh"], c: 0 },
+                { q: "Tết Nguyên Tiêu là ngày rằm tháng mấy?", a: ["Tháng Chạp", "Tháng Giêng", "Tháng Bảy", "Tháng Tám"], c: 1 },
+                { q: "Con giáp nào trong 12 con giáp VN khác với Trung Quốc?", a: ["Mèo", "Trâu", "Dê", "Lợn"], c: 0 },
+                { q: "Gà cúng đêm Giao thừa thường ngậm gì?", a: ["Lá chanh", "Bông hồng", "Đồng tiền", "Cành đào"], c: 1 },
+                { q: "Tết năm 1968 bắt đầu vào ngày dương lịch nào?", a: ["29/01", "30/01", "31/01", "01/02"], c: 1 },
+                { q: "Bức tranh 'Đám cưới chuột' thuộc dòng tranh nào?", a: ["Hàng Trống", "Đông Hồ", "Sơn mài", "Thủy mặc"], c: 1 },
+                { q: "Lễ Hóa vàng thường được thực hiện vào ngày nào?", a: ["Mùng 1", "Mùng 3 hoặc mùng 4", "Rằm tháng Giêng", "23 tháng Chạp"], c: 1 },
+                { q: "Sự khác biệt chính giữa Bánh Chưng và Bánh Tét là gì?", a: ["Nguyên liệu", "Nhân bánh", "Hình dáng và cách gói", "Thời gian luộc"], c: 2 },
+                // --- New questions from CSV ---
+                { q: "Một năm không nhuận có bao nhiêu ngày Thứ Sáu nếu ngày 1/1 là Thứ Sáu?", a: ["52", "53", "54", "51"], c: 1 },
+                { q: "Giác quan nào phát triển sớm nhất ở con người?", a: ["Thị giác", "Thính giác", "Khứu giác", "Xúc giác"], c: 3 },
+                { q: "Điều nào sau đây khiến con người hối tiếc nhiều nhất khi nhìn lại?", a: ["Những việc đã làm sai", "Những việc chưa từng làm", "Những lời đã nói", "Những quyết định vội vàng"], c: 1 },
+                { q: "Kim phút và kim giờ trùng nhau bao nhiêu lần trong 12 giờ?", a: ["10", "11", "12", "13"], c: 1 },
+                { q: "Con người chia sẻ bao nhiêu % DNA với chuối (xấp xỉ)?", a: ["10%", "30%", "60%", "90%"], c: 2 },
+                { q: "Chữ cái nào không xuất hiện trong cách viết số từ 1 đến 100 bằng tiếng Anh?", a: ["A", "B", "C", "D"], c: 0 },
+                { q: "Con người không thể cảm nhận trực tiếp điều nào sau đây?", a: ["Nhiệt độ", "Áp suất không khí", "Ánh sáng", "Âm thanh"], c: 1 },
+                { q: "Thứ gì luôn đúng, dù bạn nói nó đúng hay sai?", a: ["Lời nói dối", "Sự thật", "Câu hỏi", "Im lặng"], c: 1 },
+                { q: "Nếu mùng 1 Tết Dương lịch năm nay là Thứ Ba, thì mùng 1 Tết năm sau (không nhuận) là thứ mấy?", a: ["Thứ Tư", "Thứ Bảy", "Chủ Nhật", "Thứ Hai"], c: 0 },
+                { q: "Món bánh nào truyền thống Tết Việt nhưng không dùng gạo nếp?", a: ["Bánh chưng", "Bánh tét", "Bánh khảo", "Bánh in"], c: 2 },
+                { q: "Trong câu 'Đầu năm mua muối', muối tượng trưng cho điều gì?", a: ["Tiền bạc", "May mắn", "Gắn kết", "Sức khỏe"], c: 2 },
+                { q: "Trong câu chúc 'An khang thịnh vượng', từ nào KHÔNG phải là danh từ?", a: ["An", "Khang", "Thịnh", "Vượng"], c: 2 },
+                { q: "Tết Nguyên Đán về bản chất là lễ mừng điều gì?", a: ["Năm mới dương lịch", "Sự kết thúc năm cũ", "Chu kỳ canh tác mới", "Sự sum họp gia đình"], c: 2 },
+                { q: "Vì sao Tết luôn gắn với việc 'dọn dẹp – làm mới' nhà cửa?", a: ["Để đẹp hơn", "Để đón khách", "Để xua điều cũ", "Để tiện sinh hoạt"], c: 2 },
+                { q: "Quốc gia nào đón năm mới bằng việc… đập vỡ bát đĩa trước cửa nhà người khác?", a: ["Nhật Bản", "Đan Mạch", "Hy Lạp", "Hàn Quốc"], c: 1 },
+                { q: "Quốc gia nào có phong tục ngủ sớm đêm giao thừa để đón năm mới tỉnh táo?", a: ["Na Uy", "Nhật Bản", "Singapore", "Phần Lan"], c: 1 },
+                { q: "Quốc gia nào đón năm mới bằng việc nhảy xuống biển?", a: ["Canada", "Nga", "Hà Lan", "Úc"], c: 2 },
+                { q: "Thứ gì càng đo lường càng thay đổi?", a: ["Sự thật", "Hành vi", "Thời gian", "Dữ liệu"], c: 1 },
+                { q: "Thứ gì tồn tại càng lâu càng ít được nhận ra?", a: ["Không khí", "Thói quen", "Văn hóa", "Quy tắc"], c: 1 },
+                { q: "Có 10 đôi găng tay (trái–phải). Lấy ngẫu nhiên bao nhiêu chiếc để chắc chắn có 1 đôi hoàn chỉnh?", a: ["11", "12", "21", "20"], c: 0 }
+            ],
+            hard: [
+                // --- Original questions ---
+                { q: "Theo phong tục, cây Nêu được hạ xuống vào ngày nào?", a: ["Mùng 3", "Mùng 7", "Rằm tháng Giêng", "Mùng 10"], c: 1 },
+                { q: "Năm 2026 (Bính Ngọ), tiết Lập Xuân rơi vào ngày nào dương lịch?", a: ["03/02", "04/02", "05/02", "06/02"], c: 1 },
+                { q: "Bức tranh ngũ quả nổi tiếng 'Phúc Lộc Thọ' của dòng tranh Hàng Trống có quả gì ở giữa?", a: ["Quả Phật thủ", "Quả Đào", "Quả Lựu", "Quả Mướp đắng"], c: 0 },
+                { q: "Trong nghi lễ cung đình Huế xưa, lễ tế quan trọng nhất đầu năm là gì?", a: ["Lễ Ban Sóc", "Lễ Tế Nam Giao", "Lễ Truyền Lô", "Lễ Thiết Triều"], c: 1 },
+                { q: "Savills Châu Á Thái Bình Dương có trụ sở chính đặt tại đâu?", a: ["Singapore", "Hong Kong", "Tokyo", "Sydney"], c: 1 },
+                { q: "Người đầu tiên ký hợp đồng liên doanh thành lập Savills Việt Nam là ai?", a: ["Neil MacGregor", "Matthew Powell", "Trần Quang Tuấn", "Sử Ngọc Khương"], c: 0 },
+                { q: "Năm Canh Tý (2020), ngày mùng 1 Tết trùng với sự kiện thiên văn nào?", a: ["Nhật thực", "Mưa sao băng", "Siêu trăng", "Không có sự kiện đặc biệt"], c: 3 },
+                { q: "Trong bài thơ 'Ông Đồ', tại sao 'Nghiên nghiên giấy đỏ buồn không thắm'?", a: ["Vì trời mưa", "Vì không ai thuê viết", "Vì giấy cũ", "Vì mực hỏng"], c: 1 },
+                { q: "Món 'Thịt kho tàu' thực chất có nguồn gốc từ đâu theo cách giải thích chữ 'Tàu'?", a: ["Trung Quốc", "Người Hoa ở VN", "Vị mặn của nước biển (tàu thuyền)", "Sông nước/Lạt (tiếng miền Tây)"], c: 3 },
+                { q: "Tục lệ 'Cưới vợ gả chồng' ngày Tết xưa gọi là gì?", a: ["Tết Hỉ", "Lễ xem mắt", "Tết làm rể", "Lễ dạm ngõ"], c: 2 },
+                { q: "Năm 2026, theo lịch âm là năm Bính Ngọ. Vậy năm 1966 cũng là Bính Ngọ, năm đó thuộc mệnh gì?", a: ["Thiên Thượng Thủy", "Thiên Hà Thủy", "Lộ Bàng Thổ", "Sa Trung Kim"], c: 1 },
+                { q: "Trong 12 con giáp, con vật nào là con vật duy nhất không có thật trong tự nhiên?", a: ["Rồng", "Lân", "Phượng", "Quy"], c: 0 },
+                { q: "Loại rượu nào thường được nhắc đến trong các điển tích Tết xưa?", a: ["Rượu nếp", "Rượu hồng đào", "Rượu cúc", "Rượu bồ đào"], c: 2 },
+                { q: "Sự kiện nào đánh dấu sự thay đổi lớn nhất của Savills toàn cầu vào năm 1988?", a: ["Đổi tên từ Savill & Sons", "Niêm yết trên sàn chứng khoán London", "Mở văn phòng tại Mỹ", "Mua lại tập đoàn CBRE"], c: 1 },
+                { q: "Trong mâm cỗ Tết, 'Bánh chưng' đại diện cho Đất, vậy món nào đại diện cho Trời?", a: ["Bánh Giầy", "Xôi gấc", "Gà luộc", "Rượu"], c: 0 },
+                // --- New questions from CSV ---
+                { q: "Quốc gia nào có nhiều múi giờ nhất thế giới?", a: ["Nga", "Mỹ", "Pháp", "Trung Quốc"], c: 2 },
+                { q: "Số nào sau đây không thể viết thành tổng của hai số nguyên tố?", a: ["9", "11", "13", "15"], c: 1 },
+                { q: "Nếu hôm qua là ngày mai của ngày kia, thì hôm nay là thứ mấy?", a: ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm"], c: 2 },
+                { q: "Số nào tiếp theo trong dãy: 1 – 11 – 21 – 1211 – 111221 – ?", a: ["212223", "312211", "111321", "131122"], c: 1 },
+                { q: "Thứ gì có cổ nhưng không có đầu, có lưng nhưng không có thân?", a: ["Áo sơ mi", "Cái ghế", "Chai nước", "Quyển sách"], c: 0 },
+                { q: "Có 5 người xếp hàng. A sau E trước B, C và E không đứng cạnh nhau, D không đứng cạnh A C và E. Ai đứng giữa?", a: ["A", "B", "C", "D"], c: 2 },
+                { q: "Nếu hôm qua là ngày kia của hôm kia, thì hôm nay là thứ mấy?", a: ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm"], c: 2 }
+            ]
+        };
 
-        <div id="prize-zone" class="prize-display">Đang chuẩn bị...</div>
+        const prizes = [
+            "0", "5K", "10K", "15K", "20K", "MỐC 1: 🎁 QUÀ TẾT",
+            "25K", "30K", "35K", "40K", "MỐC 2: 🧧 LÌ XÌ KHỦNG",
+            "💰 +100K", "💰 +100K", "💰 +100K", "💰 +100K", "🏆 GRAND PRIZE"
+        ];
 
-        <div class="question-box" id="question-text">
-            Bấm "Bắt đầu" để mời thí sinh lên ghế nóng!
-        </div>
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let usedLifelines = { f50: false, call: false, aud: false };
 
-        <div class="options-grid" id="options-container">
-            <!-- Options will appear here -->
-        </div>
-
-        <div class="mt-4">
-            <button id="start-btn" class="btn btn-primary btn-lg" onclick="startGame()">BẮT ĐẦU CHƠI</button>
-        </div>
-    </div>
-
-    <div class="sidebar" id="ladder">
-        <!-- Prize ladder will be generated here -->
-    </div>
-</div>
-
-<script>
-    const questionPools = {
-        easy: [
-            // --- Original questions ---
-            { q: "Hoa nào đặc trưng cho Tết miền Bắc?", a: ["Hoa Mai", "Hoa Đào", "Hoa Hồng", "Hoa Cúc"], c: 1 },
-            { q: "Bánh chưng có hình gì?", a: ["Hình tròn", "Hình vuông", "Hình tam giác", "Hình dài"], c: 1 },
-            { q: "Ngày 23 tháng Chạp là ngày tiễn ai về trời?", a: ["Ông Địa", "Ông Táo", "Thần Tài", "Ông Bà"], c: 1 },
-            { q: "Mâm ngũ quả miền Nam thường có quả nào?", a: ["Chuối", "Đu đủ", "Cam", "Lê"], c: 1 },
-            { q: "Năm 2026 là năm con gì?", a: ["Giáp Thìn", "Bính Ngọ", "Ất Tỵ", "Đinh Mùi"], c: 1 },
-            { q: "Tục lệ xông đất diễn ra vào lúc nào?", a: ["Giao thừa", "Sáng mùng 1", "Chiều mùng 1", "Mùng 2"], c: 0 },
-            { q: "Lì xì thường được đựng trong phong bao màu gì?", a: ["Vàng", "Đỏ", "Xanh", "Trắng"], c: 1 },
-            { q: "Quả nào sau đây KHÔNG nằm trong mâm ngũ quả 'Cầu dừa đủ xoài sung'?", a: ["Dưa hấu", "Đu đủ", "Xoài", "Sung"], c: 0 },
-            { q: "Con vật nào đứng đầu trong 12 con giáp?", a: ["Trâu", "Hổ", "Chuột", "Rồng"], c: 2 },
-            { q: "Thịt kho tàu thường được ăn kèm với món gì ngày Tết?", a: ["Dưa giá", "Cà pháo", "Kim chi", "Su hào"], c: 0 },
-            { q: "Đêm giao thừa còn có tên gọi khác là gì?", a: ["Trừ tịch", "Thượng nguyên", "Trung nguyên", "Hạ nguyên"], c: 0 },
-            { q: "Mâm cỗ Tết miền Bắc không thể thiếu món canh nào?", a: ["Canh chua", "Canh khổ qua", "Canh bóng thập cẩm", "Canh khoai tây"], c: 2 },
-            { q: "Lễ hội Gò Đống Đa diễn ra vào ngày nào tháng Giêng?", a: ["Mùng 3", "Mùng 5", "Mùng 10", "Rằm"], c: 1 },
-            { q: "Tục lệ 'Khai bút đầu năm' mong muốn điều gì?", a: ["Học hành tấn tới", "Sống thọ", "Phát tài", "Nhiều con cái"], c: 0 },
-            // --- New questions from CSV ---
-            { q: "Loài vật nào không bao giờ ngủ?", a: ["Cá mập", "Cá heo", "Chim sẻ", "Dơi"], c: 0 },
-            { q: "Nếu vượt qua người đứng thứ hai trong một cuộc đua, bạn đang ở vị trí nào?", a: ["Thứ nhất", "Thứ hai", "Thứ ba", "Không xác định"], c: 1 },
-            { q: "Từ nào sau đây không có nguồn gốc Hán – Việt?", a: ["Gia đình", "Xã hội", "Cà phê", "Kinh tế"], c: 2 },
-            { q: "Ánh sáng từ Mặt Trời mất bao lâu để tới Trái Đất?", a: ["8 phút", "8 giây", "1 phút", "1 giờ"], c: 0 },
-            { q: "Internet ban đầu được tạo ra với mục đích chính nào?", a: ["Giải trí", "Giáo dục", "Quân sự", "Thương mại"], c: 2 },
-            { q: "Hành tinh nào quay quanh trục theo chiều ngược lại so với đa số các hành tinh khác?", a: ["Sao Hỏa", "Sao Kim", "Sao Thủy", "Sao Mộc"], c: 1 },
-            { q: "Số La Mã nào là số lớn nhất có thể viết chỉ bằng 3 ký tự?", a: ["LLL", "CXC", "DCC", "MMM"], c: 3 },
-            { q: "Màu sắc nào truyền thống KHÔNG mang ý nghĩa may mắn trong Tết Á Đông?", a: ["Đỏ", "Vàng", "Trắng", "Cam"], c: 2 },
-            { q: "Phong tục lì xì ban đầu mang ý nghĩa chính nào?", a: ["Cho tiền may mắn", "Trừ tà – xua đuổi điều xấu", "Thể hiện địa vị", "Phần thưởng đầu năm"], c: 1 },
-            { q: "Phong tục nào dưới đây mang ý nghĩa 'định hướng năm mới' nhiều hơn là cầu may?", a: ["Xông đất", "Lì xì", "Cúng giao thừa", "Chúc Tết"], c: 0 },
-            { q: "Vì sao người Việt kiêng quét nhà trong mùng 1 Tết?", a: ["Sợ xui", "Sợ mất tiền", "Sợ mất lộc", "Sợ làm phiền tổ tiên"], c: 2 },
-            { q: "Điểm chung quan trọng nhất của các nghi lễ Tết là gì?", a: ["Cúng bái", "Tụ họp", "Lặp lại hằng năm", "Tính biểu tượng"], c: 3 },
-            { q: "Trong văn hoá Tết, 'ăn' mang ý nghĩa gì nhiều nhất?", a: ["Thưởng thức", "No đủ", "Chia sẻ", "Hưởng thụ"], c: 2 },
-            { q: "Câu nói nào thể hiện rõ nhất tinh thần Tết Việt?", a: ["Có thực mới vực được đạo", "Một cây làm chẳng nên non", "Uống nước nhớ nguồn", "Được ăn cả, ngã về không"], c: 2 },
-            { q: "Quốc gia nào đón năm mới bằng việc ăn nho theo từng tiếng chuông?", a: ["Ý", "Tây Ban Nha", "Mexico", "Argentina"], c: 1 }
-        ],
-        medium: [
-            // --- Original questions ---
-            { q: "Quả nào 'Cầu' trong mâm ngũ quả?", a: ["Dừa", "Xoài", "Mãng cầu", "Sung"], c: 2 },
-            { q: "Năm nhuận âm lịch thường có mấy tháng?", a: ["12", "13", "11", "14"], c: 1 },
-            { q: "Savills Việt Nam được thành lập năm nào?", a: ["1995", "1998", "2000", "2005"], c: 0 },
-            { q: "Loại cây nào là biểu tượng của quân tử trong Tứ Quý?", a: ["Mai", "Trúc", "Cúc", "Tùng"], c: 1 },
-            { q: "Canh khổ qua ngày Tết ngụ ý gì?", a: ["Cho đắng", "Khổ qua đi", "Ăn cho mát", "Giữ dáng"], c: 1 },
-            { q: "Vị vua nào đại phá quân Thanh vào dịp Tết?", a: ["Quang Trung", "Lê Lợi", "Gia Long", "Đinh Bộ Lĩnh"], c: 0 },
-            { q: "Tết Nguyên Tiêu là ngày rằm tháng mấy?", a: ["Tháng Chạp", "Tháng Giêng", "Tháng Bảy", "Tháng Tám"], c: 1 },
-            { q: "Con giáp nào trong 12 con giáp VN khác với Trung Quốc?", a: ["Mèo", "Trâu", "Dê", "Lợn"], c: 0 },
-            { q: "Gà cúng đêm Giao thừa thường ngậm gì?", a: ["Lá chanh", "Bông hồng", "Đồng tiền", "Cành đào"], c: 1 },
-            { q: "Tết năm 1968 bắt đầu vào ngày dương lịch nào?", a: ["29/01", "30/01", "31/01", "01/02"], c: 1 },
-            { q: "Bức tranh 'Đám cưới chuột' thuộc dòng tranh nào?", a: ["Hàng Trống", "Đông Hồ", "Sơn mài", "Thủy mặc"], c: 1 },
-            { q: "Lễ Hóa vàng thường được thực hiện vào ngày nào?", a: ["Mùng 1", "Mùng 3 hoặc mùng 4", "Rằm tháng Giêng", "23 tháng Chạp"], c: 1 },
-            { q: "Sự khác biệt chính giữa Bánh Chưng và Bánh Tét là gì?", a: ["Nguyên liệu", "Nhân bánh", "Hình dáng và cách gói", "Thời gian luộc"], c: 2 },
-            // --- New questions from CSV ---
-            { q: "Một năm không nhuận có bao nhiêu ngày Thứ Sáu nếu ngày 1/1 là Thứ Sáu?", a: ["52", "53", "54", "51"], c: 1 },
-            { q: "Giác quan nào phát triển sớm nhất ở con người?", a: ["Thị giác", "Thính giác", "Khứu giác", "Xúc giác"], c: 3 },
-            { q: "Điều nào sau đây khiến con người hối tiếc nhiều nhất khi nhìn lại?", a: ["Những việc đã làm sai", "Những việc chưa từng làm", "Những lời đã nói", "Những quyết định vội vàng"], c: 1 },
-            { q: "Kim phút và kim giờ trùng nhau bao nhiêu lần trong 12 giờ?", a: ["10", "11", "12", "13"], c: 1 },
-            { q: "Con người chia sẻ bao nhiêu % DNA với chuối (xấp xỉ)?", a: ["10%", "30%", "60%", "90%"], c: 2 },
-            { q: "Chữ cái nào không xuất hiện trong cách viết số từ 1 đến 100 bằng tiếng Anh?", a: ["A", "B", "C", "D"], c: 0 },
-            { q: "Con người không thể cảm nhận trực tiếp điều nào sau đây?", a: ["Nhiệt độ", "Áp suất không khí", "Ánh sáng", "Âm thanh"], c: 1 },
-            { q: "Thứ gì luôn đúng, dù bạn nói nó đúng hay sai?", a: ["Lời nói dối", "Sự thật", "Câu hỏi", "Im lặng"], c: 1 },
-            { q: "Nếu mùng 1 Tết năm nay là Thứ Năm, thì mùng 1 Tết năm sau (không nhuận) là thứ mấy?", a: ["Thứ Sáu", "Thứ Bảy", "Chủ Nhật", "Thứ Hai"], c: 2 },
-            { q: "Món bánh nào truyền thống Tết Việt nhưng không dùng gạo nếp?", a: ["Bánh chưng", "Bánh tét", "Bánh khảo", "Bánh in"], c: 2 },
-            { q: "Trong câu 'Đầu năm mua muối', muối tượng trưng cho điều gì?", a: ["Tiền bạc", "May mắn", "Gắn kết", "Sức khỏe"], c: 2 },
-            { q: "Trong câu chúc 'An khang thịnh vượng', từ nào KHÔNG phải là danh từ?", a: ["An", "Khang", "Thịnh", "Vượng"], c: 2 },
-            { q: "Tết Nguyên Đán về bản chất là lễ mừng điều gì?", a: ["Năm mới dương lịch", "Sự kết thúc năm cũ", "Chu kỳ canh tác mới", "Sự sum họp gia đình"], c: 2 },
-            { q: "Vì sao Tết luôn gắn với việc 'dọn dẹp – làm mới' nhà cửa?", a: ["Để đẹp hơn", "Để đón khách", "Để xua điều cũ", "Để tiện sinh hoạt"], c: 2 },
-            { q: "Quốc gia nào đón năm mới bằng việc… đập vỡ bát đĩa trước cửa nhà người khác?", a: ["Nhật Bản", "Đan Mạch", "Hy Lạp", "Hàn Quốc"], c: 1 },
-            { q: "Quốc gia nào có phong tục ngủ sớm đêm giao thừa để đón năm mới tỉnh táo?", a: ["Na Uy", "Nhật Bản", "Singapore", "Phần Lan"], c: 1 },
-            { q: "Quốc gia nào đón năm mới bằng việc nhảy xuống biển?", a: ["Canada", "Nga", "Hà Lan", "Úc"], c: 2 },
-            { q: "Thứ gì càng đo lường càng thay đổi?", a: ["Sự thật", "Hành vi", "Thời gian", "Dữ liệu"], c: 1 },
-            { q: "Thứ gì tồn tại càng lâu càng ít được nhận ra?", a: ["Không khí", "Thói quen", "Văn hóa", "Quy tắc"], c: 1 },
-            { q: "Có 10 đôi găng tay (trái–phải). Lấy ngẫu nhiên bao nhiêu chiếc để chắc chắn có 1 đôi hoàn chỉnh?", a: ["11", "12", "21", "20"], c: 2 }
-        ],
-        hard: [
-            // --- Original questions ---
-            { q: "Theo phong tục, cây Nêu được hạ xuống vào ngày nào?", a: ["Mùng 3", "Mùng 7", "Rằm tháng Giêng", "Mùng 10"], c: 1 },
-            { q: "Năm 2026 (Bính Ngọ), tiết Lập Xuân rơi vào ngày nào dương lịch?", a: ["03/02", "04/02", "05/02", "06/02"], c: 1 },
-            { q: "Bức tranh ngũ quả nổi tiếng 'Phúc Lộc Thọ' của dòng tranh Hàng Trống có quả gì ở giữa?", a: ["Quả Phật thủ", "Quả Đào", "Quả Lựu", "Quả Mướp đắng"], c: 0 },
-            { q: "Trong nghi lễ cung đình Huế xưa, lễ tế quan trọng nhất đầu năm là gì?", a: ["Lễ Ban Sóc", "Lễ Tế Nam Giao", "Lễ Truyền Lô", "Lễ Thiết Triều"], c: 1 },
-            { q: "Savills Châu Á Thái Bình Dương có trụ sở chính đặt tại đâu?", a: ["Singapore", "Hong Kong", "Tokyo", "Sydney"], c: 1 },
-            { q: "Người đầu tiên ký hợp đồng liên doanh thành lập Savills Việt Nam là ai?", a: ["Neil MacGregor", "Matthew Powell", "Trần Quang Tuấn", "Sử Ngọc Khương"], c: 0 },
-            { q: "Năm Canh Tý (2020), ngày mùng 1 Tết trùng với sự kiện thiên văn nào?", a: ["Nhật thực", "Mưa sao băng", "Siêu trăng", "Không có sự kiện đặc biệt"], c: 3 },
-            { q: "Trong bài thơ 'Ông Đồ', tại sao 'Nghiên nghiên giấy đỏ buồn không thắm'?", a: ["Vì trời mưa", "Vì không ai thuê viết", "Vì giấy cũ", "Vì mực hỏng"], c: 1 },
-            { q: "Món 'Thịt kho tàu' thực chất có nguồn gốc từ đâu theo cách giải thích chữ 'Tàu'?", a: ["Trung Quốc", "Người Hoa ở VN", "Vị mặn của nước biển (tàu thuyền)", "Sông nước/Lạt (tiếng miền Tây)"], c: 3 },
-            { q: "Tục lệ 'Cưới vợ gả chồng' ngày Tết xưa gọi là gì?", a: ["Tết Hỉ", "Lễ xem mắt", "Tết làm rể", "Lễ dạm ngõ"], c: 2 },
-            { q: "Năm 2026, theo lịch âm là năm Bính Ngọ. Vậy năm 1966 cũng là Bính Ngọ, năm đó thuộc mệnh gì?", a: ["Thiên Thượng Thủy", "Thiên Hà Thủy", "Lộ Bàng Thổ", "Sa Trung Kim"], c: 1 },
-            { q: "Trong 12 con giáp, con vật nào là con vật duy nhất không có thật trong tự nhiên?", a: ["Rồng", "Lân", "Phượng", "Quy"], c: 0 },
-            { q: "Loại rượu nào thường được nhắc đến trong các điển tích Tết xưa?", a: ["Rượu nếp", "Rượu hồng đào", "Rượu cúc", "Rượu bồ đào"], c: 2 },
-            { q: "Sự kiện nào đánh dấu sự thay đổi lớn nhất của Savills toàn cầu vào năm 1988?", a: ["Đổi tên từ Savill & Sons", "Niêm yết trên sàn chứng khoán London", "Mở văn phòng tại Mỹ", "Mua lại tập đoàn CBRE"], c: 1 },
-            { q: "Trong mâm cỗ Tết, 'Bánh chưng' đại diện cho Đất, vậy món nào đại diện cho Trời?", a: ["Bánh Giầy", "Xôi gấc", "Gà luộc", "Rượu"], c: 0 },
-            // --- New questions from CSV ---
-            { q: "Quốc gia nào có nhiều múi giờ nhất thế giới?", a: ["Nga", "Mỹ", "Pháp", "Trung Quốc"], c: 2 },
-            { q: "Số nào sau đây không thể viết thành tổng của hai số nguyên tố?", a: ["9", "11", "13", "15"], c: 1 },
-            { q: "Nếu hôm qua là ngày mai của ngày kia, thì hôm nay là thứ mấy?", a: ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm"], c: 2 },
-            { q: "Số nào tiếp theo trong dãy: 1 – 11 – 21 – 1211 – 111221 – ?", a: ["212223", "312211", "111321", "131122"], c: 1 },
-            { q: "Thứ gì có cổ nhưng không có đầu, có lưng nhưng không có thân?", a: ["Áo sơ mi", "Cái ghế", "Chai nước", "Quyển sách"], c: 0 },
-            { q: "Có 5 người xếp hàng. A đứng trước B, C đứng sau D, B đứng sau D. Ai đứng giữa?", a: ["A", "B", "C", "D"], c: 3 },
-            { q: "Nếu hôm qua là ngày kia của hôm kia, thì hôm nay là thứ mấy?", a: ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm"], c: 1 }
-        ]
-    };
-
-    const prizes = [
-        "0", "50K", "100K", "150K", "200K", "MỐC 1: 🎁 QUÀ TẾT",
-        "300K", "400K", "500K", "600K", "MỐC 2: 🧧 LÌ XÌ KHỦNG",
-        "💰 +100K", "💰 +200K", "💰 +300K", "💰 +400K", "🏆 GRAND PRIZE"
-    ];
-
-    let currentQuestions = [];
-    let currentIndex = 0;
-    let usedLifelines = { f50: false, call: false, aud: false };
-
-    function renderLadder() {
-        const ladder = document.getElementById('ladder');
-        ladder.innerHTML = '';
-        for (let i = prizes.length - 1; i >= 1; i--) {
-            const div = document.createElement('div');
-            div.className = `ladder-item ${i === currentIndex ? 'active' : ''} ${i % 5 === 0 ? 'milestone' : ''}`;
-            div.innerText = `${i}. ${prizes[i]}`;
-            ladder.appendChild(div);
-        }
-    }
-
-    function shuffle(array) {
-        return array.sort(() => Math.random() - 0.5);
-    }
-
-    function startGame() {
-        // Pick 5 from each pool
-        const easy = shuffle([...questionPools.easy]).slice(0, 5);
-        const medium = shuffle([...questionPools.medium]).slice(0, 5);
-        const hard = shuffle([...questionPools.hard]).slice(0, 5);
-        currentQuestions = [...easy, ...medium, ...hard];
-        currentIndex = 1;
-        usedLifelines = { f50: false, call: false, aud: false };
-        updateLifelineUI();
-        showQuestion();
-        document.getElementById('start-btn').style.display = 'none';
-    }
-
-    function showQuestion() {
-        renderLadder();
-        const qData = currentQuestions[currentIndex - 1];
-        document.getElementById('question-text').innerText = `Câu ${currentIndex}: ${qData.q}`;
-        document.getElementById('prize-zone').innerText = `Giải thưởng hiện tại: ${prizes[currentIndex]}`;
-        
-        const container = document.getElementById('options-container');
-        container.innerHTML = '';
-        qData.a.forEach((opt, idx) => {
-            const btn = document.createElement('div');
-            btn.className = 'option-btn';
-            btn.innerHTML = `<strong>${String.fromCharCode(65 + idx)}:</strong> ${opt}`;
-            btn.onclick = () => selectOption(idx, btn);
-            container.appendChild(btn);
-        });
-    }
-
-    function selectOption(idx, btn) {
-        const qData = currentQuestions[currentIndex - 1];
-        const allBtns = document.querySelectorAll('.option-btn');
-        allBtns.forEach(b => b.onclick = null); // Disable further clicks
-        
-        btn.classList.add('selected');
-        
-        setTimeout(() => {
-            if (idx === qData.c) {
-                btn.classList.remove('selected');
-                btn.classList.add('correct');
-                setTimeout(() => {
-                    if (currentIndex === 15) {
-                        alert("CHÚC MỪNG! BẠN LÀ TRIỆU PHÚ TET! TRÒ CHƠI KẾT THÚC.");
-                        location.reload();
-                    } else {
-                        currentIndex++;
-                        showQuestion();
-                    }
-                }, 1000);
-            } else {
-                btn.classList.remove('selected');
-                btn.classList.add('wrong');
-                allBtns[qData.c].classList.add('correct');
-                setTimeout(() => {
-                    alert(`Rất tiếc! Trò chơi kết thúc cho bạn. Mời thí sinh tiếp theo.`);
-                    resetGame();
-                }, 2000);
+        function renderLadder() {
+            const ladder = document.getElementById('ladder');
+            ladder.innerHTML = '';
+            for (let i = prizes.length - 1; i >= 1; i--) {
+                const div = document.createElement('div');
+                div.className = `ladder-item ${i === currentIndex ? 'active' : ''} ${i % 5 === 0 ? 'milestone' : ''}`;
+                div.innerText = `${i}. ${prizes[i]}`;
+                ladder.appendChild(div);
             }
-        }, 1500);
-    }
+        }
 
-    function resetGame() {
-        document.getElementById('start-btn').style.display = 'block';
-        document.getElementById('question-text').innerText = 'Mời thí sinh tiếp theo...';
-        document.getElementById('options-container').innerHTML = '';
-        currentIndex = 0;
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function startGame() {
+            // Pick 5 from each pool
+            const easy = shuffle([...questionPools.easy]).slice(0, 5);
+            const medium = shuffle([...questionPools.medium]).slice(0, 5);
+            const hard = shuffle([...questionPools.hard]).slice(0, 5);
+            currentQuestions = [...easy, ...medium, ...hard];
+            currentIndex = 1;
+            usedLifelines = { f50: false, call: false, aud: false };
+            updateLifelineUI();
+            showQuestion();
+            document.getElementById('start-btn').style.display = 'none';
+        }
+
+        function showQuestion() {
+            renderLadder();
+            const qData = currentQuestions[currentIndex - 1];
+            document.getElementById('question-text').innerText = `Câu ${currentIndex}: ${qData.q}`;
+            document.getElementById('prize-zone').innerText = `Giải thưởng hiện tại: ${prizes[currentIndex]}`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            qData.a.forEach((opt, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<strong>${String.fromCharCode(65 + idx)}:</strong> ${opt}`;
+                btn.onclick = () => selectOption(idx, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(idx, btn) {
+            const qData = currentQuestions[currentIndex - 1];
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.onclick = null); // Disable further clicks
+
+            btn.classList.add('selected');
+
+            setTimeout(() => {
+                if (idx === qData.c) {
+                    btn.classList.remove('selected');
+                    btn.classList.add('correct');
+                    setTimeout(() => {
+                        if (currentIndex === 15) {
+                            alert("CHÚC MỪNG! BẠN LÀ TRIỆU PHÚ TET! TRÒ CHƠI KẾT THÚC.");
+                            location.reload();
+                        } else {
+                            currentIndex++;
+                            showQuestion();
+                        }
+                    }, 1000);
+                } else {
+                    btn.classList.remove('selected');
+                    btn.classList.add('wrong');
+                    allBtns[qData.c].classList.add('correct');
+                    setTimeout(() => {
+                        alert(`Rất tiếc! Trò chơi kết thúc cho bạn. Mời thí sinh tiếp theo.`);
+                        resetGame();
+                    }, 2000);
+                }
+            }, 1500);
+        }
+
+        function resetGame() {
+            document.getElementById('start-btn').style.display = 'block';
+            document.getElementById('question-text').innerText = 'Mời thí sinh tiếp theo...';
+            document.getElementById('options-container').innerHTML = '';
+            currentIndex = 0;
+            renderLadder();
+        }
+
+        function walkAway() {
+            alert(`Bạn đã dừng lại với phần thưởng: ${prizes[currentIndex - 1]}. Chúc mừng!`);
+            resetGame();
+        }
+
+        // Lifelines
+        function use5050() {
+            if (usedLifelines.f50 || currentIndex === 0) return;
+            usedLifelines.f50 = true;
+            updateLifelineUI();
+            const qData = currentQuestions[currentIndex - 1];
+            const btns = document.querySelectorAll('.option-btn');
+            let removed = 0;
+            let indices = [0, 1, 2, 3].filter(i => i !== qData.c);
+            shuffle(indices);
+            indices.slice(0, 2).forEach(i => {
+                btns[i].innerText = '';
+                btns[i].onclick = null;
+            });
+        }
+
+        function useCall() {
+            if (usedLifelines.call || currentIndex === 0) return;
+            usedLifelines.call = true;
+            updateLifelineUI();
+            alert("Đang kết nối với người thân... 'Tôi nghĩ đáp án là " + String.fromCharCode(65 + currentQuestions[currentIndex - 1].c) + "... chắc vậy!'");
+        }
+
+        function useAudience() {
+            if (usedLifelines.aud || currentIndex === 0) return;
+            usedLifelines.aud = true;
+            updateLifelineUI();
+            alert("Khán giả đang bình chọn... [Thanh chat đang bùng nổ!]");
+        }
+
+        function updateLifelineUI() {
+            if (usedLifelines.f50) document.getElementById('ll-50').classList.add('used');
+            else document.getElementById('ll-50').classList.remove('used');
+            if (usedLifelines.call) document.getElementById('ll-call').classList.add('used');
+            else document.getElementById('ll-call').classList.remove('used');
+            if (usedLifelines.aud) document.getElementById('ll-audience').classList.add('used');
+            else document.getElementById('ll-audience').classList.remove('used');
+        }
+
         renderLadder();
-    }
-
-    function walkAway() {
-        alert(`Bạn đã dừng lại với phần thưởng: ${prizes[currentIndex-1]}. Chúc mừng!`);
-        resetGame();
-    }
-
-    // Lifelines
-    function use5050() {
-        if (usedLifelines.f50 || currentIndex === 0) return;
-        usedLifelines.f50 = true;
-        updateLifelineUI();
-        const qData = currentQuestions[currentIndex - 1];
-        const btns = document.querySelectorAll('.option-btn');
-        let removed = 0;
-        let indices = [0, 1, 2, 3].filter(i => i !== qData.c);
-        shuffle(indices);
-        indices.slice(0, 2).forEach(i => {
-            btns[i].innerText = '';
-            btns[i].onclick = null;
-        });
-    }
-
-    function useCall() {
-        if (usedLifelines.call || currentIndex === 0) return;
-        usedLifelines.call = true;
-        updateLifelineUI();
-        alert("Đang kết nối với người thân... 'Tôi nghĩ đáp án là " + String.fromCharCode(65 + currentQuestions[currentIndex-1].c) + "... chắc vậy!'");
-    }
-
-    function useAudience() {
-        if (usedLifelines.aud || currentIndex === 0) return;
-        usedLifelines.aud = true;
-        updateLifelineUI();
-        alert("Khán giả đang bình chọn... [Thanh chat đang bùng nổ!]");
-    }
-
-    function updateLifelineUI() {
-        if (usedLifelines.f50) document.getElementById('ll-50').classList.add('used');
-        else document.getElementById('ll-50').classList.remove('used');
-        if (usedLifelines.call) document.getElementById('ll-call').classList.add('used');
-        else document.getElementById('ll-call').classList.remove('used');
-        if (usedLifelines.aud) document.getElementById('ll-audience').classList.add('used');
-        else document.getElementById('ll-audience').classList.remove('used');
-    }
-
-    renderLadder();
-</script>
+    </script>
 </body>
+
 </html>
