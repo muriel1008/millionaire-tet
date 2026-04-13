@@ -172,6 +172,7 @@
 
             <div class="mt-4">
                 <button id="start-btn" class="btn btn-primary btn-lg" onclick="startGame()">BẮT ĐẦU CHƠI</button>
+                <button id="next-btn" class="btn btn-success btn-lg" onclick="proceedNext()" style="display:none;">TIẾP THEO →</button>
             </div>
         </div>
 
@@ -281,6 +282,7 @@
         let currentQuestions = [];
         let currentIndex = 0;
         let usedLifelines = { f50: false, call: false, aud: false };
+        let lastAnswerCorrect = false;
 
         // Persistent question tracking
         let availableIndices = {
@@ -359,32 +361,44 @@
             btn.classList.add('selected');
 
             setTimeout(() => {
+                const nextBtn = document.getElementById('next-btn');
                 if (idx === qData.c) {
                     btn.classList.remove('selected');
                     btn.classList.add('correct');
-                    setTimeout(() => {
-                        if (currentIndex === 15) {
-                            alert("CHÚC MỪNG! BẠN LÀ TRIỆU PHÚ TET! TRÒ CHƠI KẾT THÚC.");
-                            location.reload();
-                        } else {
-                            currentIndex++;
-                            showQuestion();
-                        }
-                    }, 1000);
+                    lastAnswerCorrect = true;
+                    nextBtn.innerText = (currentIndex === 15) ? 'TUYÊN BỐ TRIỆU PHÚ 🏆' : 'TIẾP THEO →';
+                    nextBtn.className = 'btn btn-success btn-lg';
                 } else {
                     btn.classList.remove('selected');
                     btn.classList.add('wrong');
                     allBtns[qData.c].classList.add('correct');
-                    setTimeout(() => {
-                        alert(`Rất tiếc! Trò chơi kết thúc cho bạn. Mời thí sinh tiếp theo.`);
-                        resetGame();
-                    }, 2000);
+                    lastAnswerCorrect = false;
+                    nextBtn.innerText = 'MỜI THÍ SINH KẾ TIẾP →';
+                    nextBtn.className = 'btn btn-danger btn-lg';
                 }
+                nextBtn.style.display = 'inline-block';
             }, 1500);
+        }
+
+        function proceedNext() {
+            document.getElementById('next-btn').style.display = 'none';
+            if (lastAnswerCorrect) {
+                if (currentIndex === 15) {
+                    alert("CHÚC MỪNG! BẠN LÀ TRIỆU PHÚ TET! TRÒ CHƠI KẾT THÚC.");
+                    location.reload();
+                } else {
+                    currentIndex++;
+                    showQuestion();
+                }
+            } else {
+                alert("Rất tiếc! Trò chơi kết thúc cho bạn. Mời thí sinh tiếp theo.");
+                resetGame();
+            }
         }
 
         function resetGame() {
             document.getElementById('start-btn').style.display = 'block';
+            document.getElementById('next-btn').style.display = 'none';
             document.getElementById('question-text').innerText = 'Mời thí sinh tiếp theo...';
             document.getElementById('options-container').innerHTML = '';
             currentIndex = 0;
